@@ -134,6 +134,7 @@ textarea:focus, input:focus, select:focus { outline: 2px solid var(--accent); ou
   'use strict';
   const ENDPOINT = (window.INTERVIEW_CONFIG && window.INTERVIEW_CONFIG.endpoint) || '';
   const TEST = /[?&]test=1(&|$)/.test(location.search);
+  const PREVIEW = !!(window.INTERVIEW_CONFIG && window.INTERVIEW_CONFIG.preview);
   const LS_KEY = 'composition_interview_v1';
   const MAX_BYTES = 20 * 1024 * 1024;
   const EXT = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'psd', 'clip', 'kra', 'tif', 'tiff', 'pdf'];
@@ -203,10 +204,11 @@ textarea:focus, input:focus, select:focus { outline: 2px solid var(--accent); ou
     add('4-3 완성 이미지 + 프롬프트 방식 (1~5점)', S.q43 || '');
     add('4-4 그렇게 생각하는 이유와 경험', S.q44);
     add('4-4 첨부 이미지', fileText('e1'));
-    return { id: S.rid, headers: H, values: V };
+    return { id: S.rid, rev: S.rev || 0, headers: H, values: V, state: Object.assign({ test: TEST }, S) };
   }
-  const NO_ENDPOINT = '저장 주소가 설정되지 않아 이 기기에만 저장돼요. 인터뷰 담당자에게 알려 주세요.';
-  let timer = null, dirty = false, chain = Promise.resolve(true);
+  const NO_ENDPOINT = PREVIEW ? '미리보기 페이지예요. 답변과 파일은 저장되지 않아요.' : '저장 주소가 설정되지 않아 이 기기에만 저장돼요. 인터뷰 담당자에게 알려 주세요.';
+  let timer = null, retry = null, retryWait = 4000, dirty = false, chain = Promise.resolve(true);
+  const hhmm = () => new Date().toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit' });
   function post(obj) {
     return fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(obj) })
       .then((r) => r.ok ? r.json() : { ok: false, error: 'http_' + r.status });
@@ -215,14 +217,26 @@ textarea:focus, input:focus, select:focus { outline: 2px solid var(--accent); ou
     clearTimeout(timer); timer = null;
     if (!ENDPOINT || !dirty) return chain;
     dirty = false;
+    clearTimeout(retry); retry = null;
     const body = rowFor();
     chain = chain.then(() => post(body)
-      .then((j) => { if (!j || !j.ok) throw new Error('fail'); if (!dirty) $('status').textContent = '저장됨'; return true; })
-      .catch(() => { dirty = true; $('status').textContent = '저장하지 못했어요. 인터넷 연결을 확인해 주세요. 다음 입력 때 다시 저장해요.'; return false; }));
+      .then((j) => {
+        if (!j || !j.ok || !(Number(j.rev) >= body.rev)) throw new Error('fail');
+        S.syncedRev = Math.max(S.syncedRev || 0, body.rev); persist(); retryWait = 4000;
+        if (!dirty) $('status').textContent = '저장됨 · ' + hhmm();
+        return true;
+      })
+      .catch(() => {
+        dirty = true;
+        $('status').textContent = '저장하지 못했어요. 인터넷 연결을 확인해 주세요. 잠시 뒤 자동으로 다시 저장해요.';
+        retry = setTimeout(sendRow, retryWait); retryWait = Math.min(retryWait * 2, 60000);
+        return false;
+      }));
     return chain;
   }
   function save(now) {
     S.updatedAt = new Date().toISOString();
+    S.rev = (S.rev || 0) + 1;
     persist();
     if (!ENDPOINT) { $('status').textContent = NO_ENDPOINT; return Promise.resolve(false); }
     dirty = true; $('status').textContent = '저장 중';
@@ -245,7 +259,7 @@ textarea:focus, input:focus, select:focus { outline: 2px solid var(--accent); ou
     return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1] || ''); r.onerror = () => rej(r.error); r.readAsDataURL(file); });
   }
   function addFiles(slot, list, rerender) {
-    if (!ENDPOINT) { alertMsg(slot, '저장 주소가 설정되지 않아 파일을 올릴 수 없어요. 인터뷰 담당자에게 알려 주세요.'); return; }
+    if (!ENDPOINT) { alertMsg(slot, PREVIEW ? '미리보기 페이지라 파일은 올라가지 않아요.' : '저장 주소가 설정되지 않아 파일을 올릴 수 없어요. 인터뷰 담당자에게 알려 주세요.'); return; }
     Array.from(list).forEach((file) => {
       const ext = (file.name.split('.').pop() || '').toLowerCase();
       const item = { name: file.name, size: file.size, status: 'wait', file: file };
@@ -391,6 +405,12 @@ textarea:focus, input:focus, select:focus { outline: 2px solid var(--accent); ou
       '<li>제시 이미지는 인터뷰 과제를 위해 기존 애니메이션 장면을 출처와 함께 실었어요. 다른 곳에 옮기지 말아 주세요.</li></ul>';
     p.append(c);
     if (!ENDPOINT) p.append(el('p', 'notice', NO_ENDPOINT));
+    if (S.updatedAt) {
+      const n = el('div', 'notice');
+      n.append(document.createTextNode('이 기기에 작성하던 응답이 있어요. 본인 응답이면 아래 \'이어서 하기\'를 누르세요. 다른 분이라면 '));
+      n.append(newButton('새 응답으로 시작하기'));
+      p.append(n);
+    }
   }
   function buildP1(p) {
     p.append(head('1 / 4', '구도만 남겨 그리기', '아래 이미지 3장을 다른 캐릭터와 다른 스타일로 다시 그린다고 생각해 주세요.'));
@@ -412,7 +432,7 @@ textarea:focus, input:focus, select:focus { outline: 2px solid var(--accent); ou
     });
   }
   function checkP1() {
-    if (TEST) return '';
+    if (TEST || PREVIEW) return '';
     return TASKS.some((t) => (S.files[t.key] || []).length) ? '' : '1-1은 적어도 1장의 그림을 올려 주셔야 다음으로 넘어갈 수 있어요.';
   }
   function buildP2(p) {
@@ -495,11 +515,28 @@ textarea:focus, input:focus, select:focus { outline: 2px solid var(--accent); ou
   function buildDone(p) {
     p.append(head('완료', '참여해 주셔서 감사합니다',
       S.submitted ? '답변과 그림이 저장됐어요. 이 창은 닫으셔도 돼요.' : '아직 제출 전이에요.'));
-    if (TEST) {
-      const b = el('button', 'btn', '테스트: 새 응답으로 처음부터'); b.type = 'button';
-      b.onclick = () => { S = blank(); Object.keys(pending).forEach((k) => delete pending[k]); persist(); show(0); };
-      const box = el('div'); box.append(b); p.append(box);
-    }
+    const box = el('div', 'notice');
+    if (!TEST && !PREVIEW) box.append(document.createTextNode('같은 기기로 다른 분이 이어서 응답한다면 '));
+    box.append(newButton(PREVIEW ? '처음부터 다시 보기' : TEST ? '테스트: 새 응답으로 처음부터' : '새 응답으로 시작하기'));
+    p.append(box);
+  }
+  // 같은 기기를 여러 사람이 쓸 때: 지금 응답을 서버에 확실히 보낸 뒤 새 응답 ID로 시작한다
+  function newButton(label) {
+    const b = el('button', 'btn small', label); b.type = 'button';
+    b.onclick = () => {
+      if (busy()) { alert('파일을 올리는 중이에요. 끝난 뒤 다시 눌러 주세요.'); return; }
+      if (!TEST && !PREVIEW && !confirm('새 응답을 시작할까요?\n지금까지의 응답은 저장된 채로 남고, 이 기기에서는 더 이상 열 수 없어요.')) return;
+      b.disabled = true;
+      const flush = ENDPOINT && (dirty || (S.rev || 0) > (S.syncedRev || 0)) ? (dirty = true, sendRow()) : Promise.resolve(true);
+      flush.then((ok) => {
+        b.disabled = false;
+        if (!ok) { alert('지금 응답을 아직 저장하지 못했어요. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.'); return; }
+        clearTimeout(retry); retry = null;
+        S = blank(); Object.keys(pending).forEach((k) => delete pending[k]); persist();
+        $('status').textContent = ''; show(0);
+      });
+    };
+    return b;
   }
 
   // ---------- navigation ----------
@@ -537,7 +574,9 @@ textarea:focus, input:focus, select:focus { outline: 2px solid var(--accent); ou
     if (S.page === 0 && !S.updatedAt) save();
     show(S.page + 1);
   };
-  if (TEST) $('testTag').hidden = false;
+  // 지난번에 서버까지 가지 못한 저장이 있으면 다시 보낸다
+  if (ENDPOINT && (S.rev || 0) > (S.syncedRev || 0)) { dirty = true; sendRow(); }
+  if (TEST || PREVIEW) { $('testTag').hidden = false; if (PREVIEW) $('testTag').textContent = '미리보기'; }
   show(S.submitted ? PAGES.length - 1 : S.page || 0);
 })();
 </script>
