@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>구도 후속 인터뷰</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one part per screen, a narrow reading column; task images and upload lists sit in cards */
+:root {
+  --bg: #eef0f3; --surface: #ffffff; --fg: #17191d; --muted: #5d6470; --line: #d6dae1;
+  --accent: #2f5bd3; --accent-fg: #ffffff; --soft: rgba(47,91,211,.10); --ok: #23804a; --bad: #c0392b;
+  --sheet: #f6f5f1;
+  --font: "IBM Plex Sans KR", -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121418; --surface: #1b1e24; --fg: #e9ebef; --muted: #9aa1ad; --line: #2c3039;
+  --accent: #7f9cff; --accent-fg: #0e1220; --soft: rgba(127,156,255,.14); --ok: #5ccf8a; --bad: #ff8a7a; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #121418; --surface: #1b1e24; --fg: #e9ebef; --muted: #9aa1ad; --line: #2c3039;
+  --accent: #7f9cff; --accent-fg: #0e1220; --soft: rgba(127,156,255,.14); --ok: #5ccf8a; --bad: #ff8a7a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.65 var(--font); }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 20px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 18px; }
+.bar { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; }
+.bar h1 { font-size: 17px; font-weight: 700; margin: 0; flex: 1 1 auto; }
+.testtag { font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 10px; background: var(--bad); color: #fff; }
+.count { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; }
+.track { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.track i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s ease; }
+.page { display: grid; gap: 18px; }
+.page > header { display: grid; gap: 4px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--muted); }
+.page h2 { margin: 0; font-size: 21px; text-wrap: balance; }
+.lead { margin: 0; color: var(--muted); max-width: 68ch; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 12px; min-width: 0; }
+.qno { font-size: 13px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.qtitle { margin: 0; font-size: 16px; font-weight: 600; text-wrap: balance; }
+.hint { margin: 0; font-size: 13.5px; color: var(--muted); }
+.hint ul { margin: 4px 0 0; padding-left: 18px; }
+.req { color: var(--bad); font-weight: 600; font-size: 12.5px; }
+.task-img { display: grid; gap: 6px; }
+.task-img img { width: 100%; border-radius: 8px; display: block; background: var(--line); }
+.task-img .src { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
+.task-img a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.task-img a:hover { text-decoration: underline; }
+label.fld { display: grid; gap: 6px; font-weight: 600; font-size: 14px; }
+label.fld span.sub { font-weight: 400; color: var(--muted); font-size: 13px; }
+textarea, input[type="text"], select { width: 100%; font: 15px/1.6 var(--font); padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); }
+textarea { min-height: 96px; resize: vertical; }
+textarea:focus, input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+
+/* uploader */
+.up { display: grid; gap: 8px; }
+.drop { border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--bg); }
+.drop.over { border-color: var(--accent); background: var(--soft); }
+.drop .t { font-size: 13.5px; color: var(--muted); flex: 1 1 220px; }
+.files { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.files li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 7px 10px; border-radius: 8px; background: var(--bg); font-size: 13.5px; }
+.files .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files .st { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+.files .st.ok { color: var(--ok); } .files .st.bad { color: var(--bad); }
+.linkbtn { border: 0; background: none; color: var(--muted); font: 500 12.5px var(--font); cursor: pointer; padding: 2px 4px; text-decoration: underline; }
+.linkbtn:hover { color: var(--fg); }
+
+/* reference cards */
+.refs { display: grid; gap: 14px; }
+.ref { border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
+.ref h4 { margin: 0; font-size: 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+/* choices */
+.opts { display: grid; gap: 6px; }
+.opt { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.opt:hover { border-color: var(--muted); }
+.opt input { margin-top: 5px; accent-color: var(--accent); }
+.opt.on { border-color: var(--accent); background: var(--soft); }
+.opt small { display: block; color: var(--muted); font-size: 12.5px; }
+.gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 620px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ex { display: grid; gap: 4px; align-content: start; }
+.ex svg { width: 100%; height: auto; display: block; border-radius: 6px; background: var(--sheet); border: 1px solid var(--line); }
+.ex b { font-size: 13.5px; }
+.ex span { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+.deflist { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; }
+.deflist b { font-weight: 600; }
+.deflist span { color: var(--muted); }
+.ranks { display: grid; gap: 8px; }
+.rank { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: center; }
+.rank b { font-variant-numeric: tabular-nums; }
+.scale { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.scale button { font: 600 16px var(--font); padding: 10px 0; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+.scale button.on { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.scale-ends { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--muted); }
+
+.nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn { font: 600 14px var(--font); padding: 9px 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.btn.small { padding: 5px 12px; font-size: 13px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn:focus-visible, .linkbtn:focus-visible, .scale button:focus-visible, .opt:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.status { font-size: 13px; color: var(--muted); }
+.msg { margin: 0; font-size: 13.5px; color: var(--bad); font-weight: 600; }
+.notice { padding: 12px 14px; border-radius: 10px; background: var(--soft); font-size: 14px; }
+.facts { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <h1>구도 후속 인터뷰 <span class="testtag" id="testTag" hidden>테스트 모드</span></h1>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="track" aria-hidden="true"><i id="trackFill"></i></div>
+  <div id="pages"></div>
+  <div class="nav" id="nav">
+    <button class="btn" id="prevBtn" type="button">이전</button>
+    <span class="status" id="status" role="status" aria-live="polite"></span>
+    <button class="btn primary" id="nextBtn" type="button">다음</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const ENDPOINT = (window.INTERVIEW_CONFIG && window.INTERVIEW_CONFIG.endpoint) || '';
+  const TEST = /[?&]test=1(&|$)/.test(location.search);
+  const LS_KEY = 'composition_interview_v1';
+  const MAX_BYTES = 20 * 1024 * 1024;
+  const EXT = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'psd', 'clip', 'kra', 'tif', 'tiff', 'pdf'];
+  const $ = (id) => document.getElementById(id);
+
+  const TASKS = [
+    { key: 't1', src: 'img/task1.jpg', credit: '《썸머 워즈》(2009)', what: '큰 상을 둘러싼 여러 인물' },
+    { key: 't2', src: 'img/task2.jpg', credit: '《사이버펑크: 엣지러너》(2022)', what: '밤의 도시와 두 인물' },
+    { key: 't3', src: 'img/task3.jpg', credit: '《AKIRA》(1988)', what: '오토바이를 탄 한 인물' },
+  ];
+  const Q31 = ['콘티 썸네일', '러프 스케치', '레이아웃 선화', '3D 포즈 툴', '직접 촬영한 사진', '기존 작품의 장면 캡처'];
+  const Q41 = [
+    { k: '러프 스케치', d: '대략적인 형태와 위치를 선으로 표현한 이미지', ex: 'rough' },
+    { k: '명암 스케치', d: '선과 간단한 명암으로 장면을 표현한 이미지', ex: 'value' },
+    { k: '회색 블로킹', d: '회색의 명도 차이로 인물·사물의 위치, 공간과 깊이를 표현한 이미지', ex: 'gray' },
+    { k: '색 영역 지도', d: '인물, 건물, 배경 등을 서로 다른 색으로 구분한 이미지', ex: 'seg' },
+    { k: '3D 레이아웃', d: '3D 공간에 인물과 사물을 배치한 이미지', ex: 'three' },
+    { k: '완성된 이미지', d: '사진이나 기존 작품처럼 색과 디테일이 모두 들어간 이미지', ex: 'final' },
+  ];
+  const Q42 = [
+    { k: '인물·사물의 배치', d: '위치, 크기, 화면에서 차지하는 비율' },
+    { k: '인물의 연기', d: '포즈, 몸의 방향, 시선 방향' },
+    { k: '카메라', d: '앵글, 시점, 샷 크기, 프레이밍' },
+    { k: '공간과 깊이', d: '전경·중경·배경의 구분, 원근감, 지평선 높이' },
+    { k: '빛과 명암', d: '광원의 방향, 주요 명암 영역' },
+    { k: '화면 구성', d: '시선 유도, 여백, 주요 피사체의 강조' },
+  ];
+  const OTHER = '기타';
+
+  // ---------- state ----------
+  const blank = () => ({
+    rid: 'iv' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+    startedAt: new Date().toISOString(), updatedAt: '', submitted: false, page: 0,
+    files: {},                 // slot -> [{name, size, url, fileId}]
+    memo: {},                  // key -> text
+    refCount: 3,
+    q31: { sel: [], other: '' },
+    q41: { rank: ['', '', ''], other: '', reason: '' },
+    q42: { rank: ['', '', ''], other: '' },
+    q43: 0,
+    q44: '',
+  });
+  let S;
+  try { S = JSON.parse(localStorage.getItem(LS_KEY)) || null; } catch (e) { S = null; }
+  if (!S || !S.rid) S = blank();
+  const pending = {};          // slot -> [{name, size, status, file}] (uploads in progress or failed, not persisted)
+
+  // ---------- saving ----------
+  function persist() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) {} }
+  const fileText = (slot) => (S.files[slot] || []).map((f) => f.name + (f.url ? ' (' + f.url + ')' : '')).join('\n');
+  const rankText = (v) => v.rank.map((x, i) => x ? (i + 1) + '위 ' + (x === OTHER ? '기타' + (v.other ? ' (' + v.other + ')' : '') : x) : '').filter(Boolean).join(', ');
+  function rowFor() {
+    const H = [], V = [];
+    const add = (h, v) => { H.push(h); V.push(v == null ? '' : v); };
+    add('응답 ID', S.rid); add('테스트', TEST ? 'Y' : ''); add('제출 여부', S.submitted ? '제출함' : '작성 중');
+    add('시작', S.startedAt); add('마지막 저장', S.updatedAt);
+    TASKS.forEach((t, i) => { add('1-1 제시 이미지 ' + (i + 1) + ' 그림', fileText(t.key)); add('1-1 제시 이미지 ' + (i + 1) + ' 메모', S.memo[t.key] || ''); });
+    for (let i = 1; i <= 5; i++) {
+      add('2-1 레퍼런스 ' + i + ' 이미지', fileText('r' + i));
+      add('2-1 레퍼런스 ' + i + ' 메모', S.memo['r' + i] || '');
+      add('2-2 레퍼런스 ' + i + ' 구도 그림', fileText('c' + i));
+    }
+    add('3-1 가장 먼저 만드는 자료', S.q31.sel.map((x) => x === OTHER ? '기타' + (S.q31.other ? ' (' + S.q31.other + ')' : '') : x).join(', '));
+    add('4-1 편하고 효과적인 레퍼런스 형태', rankText(S.q41));
+    add('4-1 이유', S.q41.reason);
+    add('4-2 AI가 꼭 유지해야 할 정보', rankText(S.q42));
+    add('4-3 완성 이미지 + 프롬프트 방식 (1~5점)', S.q43 || '');
+    add('4-4 그렇게 생각하는 이유와 경험', S.q44);
+    add('4-4 첨부 이미지', fileText('e1'));
+    return { id: S.rid, headers: H, values: V };
+  }
+  const NO_ENDPOINT = '저장 주소가 설정되지 않아 이 기기에만 저장돼요. 인터뷰 담당자에게 알려 주세요.';
+  let timer = null, dirty = false, chain = Promise.resolve(true);
+  function post(obj) {
+    return fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(obj) })
+      .then((r) => r.ok ? r.json() : { ok: false, error: 'http_' + r.status });
+  }
+  function sendRow() {
+    clearTimeout(timer); timer = null;
+    if (!ENDPOINT || !dirty) return chain;
+    dirty = false;
+    const body = rowFor();
+    chain = chain.then(() => post(body)
+      .then((j) => { if (!j || !j.ok) throw new Error('fail'); if (!dirty) $('status').textContent = '저장됨'; return true; })
+      .catch(() => { dirty = true; $('status').textContent = '저장하지 못했어요. 인터넷 연결을 확인해 주세요. 다음 입력 때 다시 저장해요.'; return false; }));
+    return chain;
+  }
+  function save(now) {
+    S.updatedAt = new Date().toISOString();
+    persist();
+    if (!ENDPOINT) { $('status').textContent = NO_ENDPOINT; return Promise.resolve(false); }
+    dirty = true; $('status').textContent = '저장 중';
+    if (now) return sendRow();
+    clearTimeout(timer); timer = setTimeout(sendRow, 1200);
+    return Promise.resolve(true);
+  }
+  function flushOnLeave() {
+    if (!ENDPOINT || !dirty) return;
+    clearTimeout(timer);
+    try { if (navigator.sendBeacon && navigator.sendBeacon(ENDPOINT, new Blob([JSON.stringify(rowFor())], { type: 'text/plain;charset=utf-8' }))) dirty = false; } catch (e) {}
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushOnLeave(); });
+  window.addEventListener('pagehide', flushOnLeave);
+
+  // ---------- uploads ----------
+  let upChain = Promise.resolve();
+  const fmtSize = (n) => n > 1048576 ? (n / 1048576).toFixed(1) + 'MB' : Math.max(1, Math.round(n / 1024)) + 'KB';
+  function readB64(file) {
+    return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1] || ''); r.onerror = () => rej(r.error); r.readAsDataURL(file); });
+  }
+  function addFiles(slot, list, rerender) {
+    if (!ENDPOINT) { alertMsg(slot, '저장 주소가 설정되지 않아 파일을 올릴 수 없어요. 인터뷰 담당자에게 알려 주세요.'); return; }
+    Array.from(list).forEach((file) => {
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const item = { name: file.name, size: file.size, status: 'wait', file: file };
+      if (EXT.indexOf(ext) === -1) { item.status = 'bad'; item.err = '올릴 수 없는 형식이에요'; }
+      else if (file.size > MAX_BYTES) { item.status = 'bad'; item.err = '20MB가 넘어요. PNG로 내보내거나 나눠 주세요'; }
+      (pending[slot] = pending[slot] || []).push(item);
+      if (item.status === 'wait') queue(slot, item, rerender);
+    });
+    rerender();
+  }
+  function queue(slot, item, rerender) {
+    item.status = 'wait'; item.err = '';
+    upChain = upChain.then(() => {
+      item.status = 'up'; rerender();
+      return readB64(item.file)
+        .then((data) => post({ kind: 'file', id: S.rid, slot: slot, name: item.name, mime: item.file.type || '', data: data }))
+        .then((j) => {
+          if (!j || !j.ok) throw new Error((j && j.error) || 'fail');
+          (S.files[slot] = S.files[slot] || []).push({ name: item.name, size: item.size, url: j.url || '', fileId: j.fileId || '' });
+          pending[slot] = pending[slot].filter((x) => x !== item);
+          save(true);
+        })
+        .catch((err) => {
+          item.status = 'bad';
+          const m = String(err && err.message);
+          item.err = m === 'too_big' ? '20MB가 넘어요' : m === 'bad_type' ? '올릴 수 없는 형식이에요' : m === 'too_many_files' ? '올릴 수 있는 파일 수를 넘었어요' : '올리지 못했어요';
+        })
+        .then(rerender);
+    });
+  }
+  function alertMsg(slot, text) { const m = document.querySelector('[data-msg="' + slot + '"]'); if (m) { m.textContent = text; m.hidden = false; } }
+
+  // ---------- DOM helpers ----------
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function uploader(slot, label, sub) {
+    const box = el('div', 'up');
+    if (label) { const l = el('div', 'qno', label); if (sub) l.append(el('span', 'hint', ' · ' + sub)); box.append(l); }
+    const drop = el('div', 'drop');
+    const input = el('input'); input.type = 'file'; input.multiple = true; input.id = 'file-' + slot; input.hidden = true;
+    input.accept = 'image/*,.psd,.clip,.kra,.tif,.tiff,.pdf';
+    const pick = el('button', 'btn small', '파일 고르기'); pick.type = 'button'; pick.onclick = () => input.click();
+    drop.append(pick, el('span', 't', '또는 여기에 끌어다 놓기 · PNG, JPG, PSD 등 · 파일당 20MB까지 · 여러 개 가능'), input);
+    const msg = el('p', 'msg'); msg.hidden = true; msg.dataset.msg = slot;
+    const ul = el('ul', 'files');
+    const render = () => {
+      ul.innerHTML = '';
+      (S.files[slot] || []).forEach((f, i) => {
+        const li = el('li'); li.append(el('span', 'nm', f.name), el('span', 'st ok', '올림 · ' + fmtSize(f.size)));
+        const rm = el('button', 'linkbtn', '목록에서 빼기'); rm.type = 'button';
+        rm.onclick = () => { S.files[slot].splice(i, 1); save(); render(); };
+        li.append(rm); ul.append(li);
+      });
+      (pending[slot] || []).forEach((p) => {
+        const li = el('li'); li.append(el('span', 'nm', p.name));
+        const st = el('span', 'st' + (p.status === 'bad' ? ' bad' : ''), p.status === 'up' ? '올리는 중… ' + fmtSize(p.size) : p.status === 'wait' ? '기다리는 중' : p.err);
+        li.append(st);
+        const b = el('button', 'linkbtn', p.status === 'bad' && p.err === '올리지 못했어요' ? '다시 시도' : '지우기'); b.type = 'button';
+        if (p.status === 'up' || p.status === 'wait') b.hidden = true;
+        b.onclick = () => { if (b.textContent === '다시 시도') queue(slot, p, render); else pending[slot] = pending[slot].filter((x) => x !== p); render(); };
+        li.append(b); ul.append(li);
+      });
+      ul.hidden = !ul.children.length;
+    };
+    input.onchange = () => { msg.hidden = true; addFiles(slot, input.files, render); input.value = ''; };
+    drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+    drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('over'); msg.hidden = true; addFiles(slot, e.dataTransfer.files, render); });
+    box.append(drop, msg, ul); render();
+    return box;
+  }
+  function memoField(key, label, sub, rows) {
+    const l = el('label', 'fld'); l.append(document.createTextNode(label));
+    if (sub) l.append(el('span', 'sub', sub));
+    const t = el('textarea'); t.id = 'memo-' + key; t.value = S.memo[key] || ''; if (rows) t.style.minHeight = rows + 'px';
+    t.oninput = () => { S.memo[key] = t.value; save(); };
+    l.append(t); return l;
+  }
+  function head(eyebrow, title, lead) {
+    const h = el('header'); h.append(el('div', 'eyebrow', eyebrow), el('h2', null, title)); if (lead) h.append(el('p', 'lead', lead)); return h;
+  }
+  function qhead(card, no, title, hint) {
+    card.append(el('div', 'qno', no), el('h3', 'qtitle', title));
+    if (hint) { const p = el('div', 'hint'); p.innerHTML = hint; card.append(p); }
+  }
+
+  // ---------- example sketches for 4-1 (same little scene drawn six ways) ----------
+  function sketch(kind) {
+    const W = 160, H = 96;
+    const parts = {
+      rough: '<g fill="none" stroke="#3a3a3a" stroke-width="1.4" stroke-linecap="round"><path d="M2 64 Q40 62 80 65 T158 63"/><path d="M14 64 L15 22 L52 21 L51 64"/><path d="M20 30 h8 M34 30 h8 M20 42 h8 M34 42 h8"/><circle cx="112" cy="40" r="6"/><path d="M112 46 L111 70 M111 70 l-6 14 M111 70 l6 14 M112 52 l-9 8 M112 52 l9 7"/><path d="M60 90 L100 66 M150 90 L120 66" stroke-dasharray="3 3"/></g>',
+      value: '<rect width="160" height="64" fill="#dcdcd6"/><rect y="64" width="160" height="32" fill="#bdbdb6"/><g fill="none" stroke="#2f2f2f" stroke-width="1.2"><path d="M2 64 H158"/><path d="M14 64 V22 H52 V64"/><circle cx="112" cy="40" r="6"/><path d="M112 46 L111 70 l-6 14 M111 70 l6 14"/></g><path d="M36 22 H52 V64 H36 Z" fill="#8c8c86"/><path d="M38 26 l12 8 M38 34 l12 8 M38 42 l12 8 M38 50 l12 8" stroke="#555" stroke-width=".8"/><ellipse cx="116" cy="86" rx="14" ry="3" fill="#7d7d77"/>',
+      gray: '<rect width="160" height="64" fill="#e4e4e0"/><rect y="64" width="160" height="32" fill="#a9a9a4"/><rect x="14" y="22" width="38" height="42" fill="#76766f"/><rect x="58" y="36" width="22" height="28" fill="#c2c2bc"/><circle cx="112" cy="40" r="6" fill="#2e2e2c"/><rect x="105" y="46" width="13" height="38" rx="5" fill="#2e2e2c"/>',
+      seg: '<rect width="160" height="64" fill="#7fb6e8"/><rect y="64" width="160" height="32" fill="#7cc46a"/><rect x="14" y="22" width="38" height="42" fill="#f0a24a"/><rect x="58" y="36" width="22" height="28" fill="#c78be0"/><circle cx="112" cy="40" r="6" fill="#e5484d"/><rect x="105" y="46" width="13" height="38" rx="5" fill="#e5484d"/>',
+      three: '<rect width="160" height="96" fill="#d9dbe0"/><g stroke="#9ea3ad" stroke-width=".8" fill="none"><path d="M0 60 H160"/><path d="M80 60 L-40 96 M80 60 L0 96 M80 60 L40 96 M80 60 L80 96 M80 60 L120 96 M80 60 L160 96 M80 60 L200 96"/><path d="M0 70 H160 M0 82 H160"/></g><path d="M18 64 L18 30 L44 26 L44 66 Z" fill="#b9bdc6"/><path d="M44 26 L56 30 L56 64 L44 66 Z" fill="#8e939e"/><path d="M18 30 L30 27 L56 30 L44 26 Z" fill="#e9ebef"/><circle cx="112" cy="40" r="6" fill="#f2f3f5" stroke="#8e939e"/><rect x="106" y="46" width="12" height="20" rx="5" fill="#eceef1" stroke="#8e939e"/><path d="M109 66 l-3 18 M115 66 l3 18" stroke="#8e939e" stroke-width="3" stroke-linecap="round"/>',
+      final: '<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6a35c"/><stop offset="1" stop-color="#f7d9a3"/></linearGradient></defs><rect width="160" height="64" fill="url(#sky)"/><rect y="64" width="160" height="32" fill="#5d6b4a"/><rect x="14" y="22" width="38" height="42" fill="#7a4e3a"/><g fill="#ffd77a"><rect x="20" y="28" width="7" height="7"/><rect x="36" y="28" width="7" height="7"/><rect x="20" y="42" width="7" height="7"/></g><rect x="36" y="22" width="16" height="42" fill="#5a3a2c" opacity=".7"/><rect x="58" y="36" width="22" height="28" fill="#93725c"/><circle cx="112" cy="40" r="6" fill="#f1c7a4"/><path d="M106 34 q6 -6 12 0 v3 h-12 z" fill="#2c2420"/><rect x="105" y="46" width="13" height="22" rx="4" fill="#2f5aa8"/><path d="M108 68 l-2 16 M115 68 l2 16" stroke="#2c2c34" stroke-width="4" stroke-linecap="round"/><ellipse cx="118" cy="86" rx="14" ry="3" fill="#3f4a33"/>',
+    };
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="예시 그림">' + parts[kind] + '</svg>';
+  }
+
+  // ---------- rank control ----------
+  function rankControl(v, opts, idp) {
+    const box = el('div', 'ranks');
+    const names = opts.map((o) => o.k).concat(OTHER);
+    const other = el('input'); other.type = 'text'; other.id = idp + '-other'; other.placeholder = '기타 내용을 적어 주세요'; other.value = v.other || '';
+    other.oninput = () => { v.other = other.value; save(); };
+    const selects = [];
+    const refresh = () => {
+      selects.forEach((s, i) => Array.from(s.options).forEach((o) => { o.disabled = !!o.value && v.rank.some((x, j) => j !== i && x === o.value); }));
+      other.hidden = !v.rank.includes(OTHER);
+    };
+    for (let i = 0; i < 3; i++) {
+      const row = el('label', 'rank'); row.append(el('b', null, (i + 1) + '위'));
+      const s = el('select'); s.id = idp + '-r' + (i + 1);
+      s.append(new Option('고르세요', ''));
+      names.forEach((n) => s.append(new Option(n, n)));
+      s.value = v.rank[i] || '';
+      s.onchange = () => { v.rank[i] = s.value; refresh(); save(); };
+      selects.push(s); row.append(s); box.append(row);
+    }
+    box.append(other); refresh();
+    return box;
+  }
+
+  // ---------- pages ----------
+  const PAGES = [
+    { title: '시작', build: buildIntro },
+    { title: '구도만 남겨 그리기', build: buildP1, check: checkP1 },
+    { title: '내가 쓰는 구도 레퍼런스', build: buildP2 },
+    { title: '구도를 잡는 방식', build: buildP3 },
+    { title: 'AI에 구도 전달하기', build: buildP4 },
+    { title: '완료', build: buildDone },
+  ];
+
+  function buildIntro(p) {
+    p.append(head('구도 후속 인터뷰', '구도를 어떻게 잡고 전달하는지 여쭤봐요',
+      '그림 작업에서 구도를 잡는 방식과, AI로 이미지를 만들 때 구도를 어떤 형태로 전달하고 싶은지 알아보려는 인터뷰예요.'));
+    const c = el('div', 'card');
+    c.innerHTML = '<ul class="facts">' +
+      '<li>4개 파트로 되어 있고, 그림 과제가 있어서 30~40분 정도 걸려요.</li>' +
+      '<li>그림은 평소 쓰는 툴로 그린 뒤 파일로 올려 주세요. 레이어를 나눌 수 있다면 PSD 한 장이나 레이어별 PNG 여러 장으로 올려 주시면 좋아요.</li>' +
+      '<li>이름이나 연락처는 받지 않아요. 올린 파일은 인터뷰 담당자의 Google 드라이브에만 저장돼요.</li>' +
+      '<li>입력한 내용은 바로바로 저장돼요. 같은 브라우저로 이 주소를 다시 열면 이어서 할 수 있어요.</li>' +
+      '<li>제시 이미지는 인터뷰 과제를 위해 기존 애니메이션 장면을 출처와 함께 실었어요. 다른 곳에 옮기지 말아 주세요.</li></ul>';
+    p.append(c);
+    if (!ENDPOINT) p.append(el('p', 'notice', NO_ENDPOINT));
+  }
+  function buildP1(p) {
+    p.append(head('1 / 4', '구도만 남겨 그리기', '아래 이미지 3장을 다른 캐릭터와 다른 스타일로 다시 그린다고 생각해 주세요.'));
+    const c = el('div', 'card');
+    qhead(c, '1-1', '구도를 유지하는 데 꼭 필요한 것만 남겨 그려 주세요.',
+      '원본 이미지를 내려받아 그 위에 그려도 되고, 따로 그려도 괜찮아요. 가능하면 레이어를 나눠 그려 주세요. <span class="req">적어도 1장은 올려 주세요.</span>');
+    p.append(c);
+    TASKS.forEach((t, i) => {
+      const k = el('div', 'card');
+      k.append(el('div', 'qno', '제시 이미지 ' + (i + 1) + ' · ' + t.what));
+      const fig = el('figure', 'task-img'); fig.style.margin = '0';
+      const img = el('img'); img.src = t.src; img.alt = '제시 이미지 ' + (i + 1) + ': ' + t.what; img.loading = 'lazy';
+      const cap = el('figcaption', 'src'); cap.append(el('span', null, '출처: ' + t.credit));
+      const a = el('a', null, '원본 내려받기'); a.href = t.src; a.download = 'composition_task' + (i + 1) + '.jpg'; cap.append(a);
+      fig.append(img, cap); k.append(fig);
+      k.append(uploader(t.key, '그린 그림 올리기'));
+      k.append(memoField(t.key, '무엇을 남기고 무엇을 뺐나요?', '예: 인물의 실루엣과 시선 방향, 지평선 높이는 남기고 옷 주름과 배경 디테일은 뺐어요', 80));
+      p.append(k);
+    });
+  }
+  function checkP1() {
+    if (TEST) return '';
+    return TASKS.some((t) => (S.files[t.key] || []).length) ? '' : '1-1은 적어도 1장의 그림을 올려 주셔야 다음으로 넘어갈 수 있어요.';
+  }
+  function buildP2(p) {
+    p.append(head('2 / 4', '내가 쓰는 구도 레퍼런스', '평소 구도를 잡을 때 자주 참고하는 이미지를 3장 정도 보여 주세요.'));
+    const c = el('div', 'card');
+    qhead(c, '2-1 · 2-2', '자주 쓰는 구도 레퍼런스와, 그 이미지에서 구도만 남긴 그림을 올려 주세요.',
+      '<ul><li>샷 크기, 앵글, 인물 수, 공간이 서로 다를수록 좋아요.</li><li>실제 작업에서 쓴 자료나 중간 작업물(콘티 썸네일, 러프 등)도 괜찮아요.</li><li>구도만 남긴 그림(2-2)은 선택이에요. 그린다면 가능하면 레이어를 나눠 주세요.</li></ul>');
+    const refs = el('div', 'refs');
+    const draw = () => {
+      refs.innerHTML = '';
+      for (let i = 1; i <= S.refCount; i++) {
+        const r = el('div', 'ref');
+        r.append(el('h4', null, '레퍼런스 ' + i));
+        r.append(uploader('r' + i, '2-1 레퍼런스 이미지'));
+        r.append(memoField('r' + i, '어떤 구도·연출인가요? 언제 쓰나요?', '예: 인물 둘을 대각선으로 배치한 로우 앵글, 대립하는 장면에 써요', 70));
+        r.append(uploader('c' + i, '2-2 구도만 남긴 그림', '선택'));
+        refs.append(r);
+      }
+      more.hidden = S.refCount >= 5;
+    };
+    const more = el('button', 'btn small', '레퍼런스 칸 더하기'); more.type = 'button';
+    more.onclick = () => { S.refCount = Math.min(5, S.refCount + 1); save(); draw(); };
+    c.append(refs, more); p.append(c); draw();
+  }
+  function buildP3(p) {
+    p.append(head('3 / 4', '구도를 잡는 방식'));
+    const c = el('div', 'card');
+    qhead(c, '3-1', '새로운 장면의 구도를 잡을 때, 가장 먼저 어떤 형태의 자료를 만드시나요?', '해당하는 것을 모두 골라 주세요.');
+    const box = el('div', 'opts');
+    const other = el('input'); other.type = 'text'; other.id = 'q31-other'; other.placeholder = '기타 내용을 적어 주세요'; other.value = S.q31.other;
+    other.oninput = () => { S.q31.other = other.value; save(); };
+    Q31.concat(OTHER).forEach((o, i) => {
+      const l = el('label', 'opt' + (S.q31.sel.includes(o) ? ' on' : ''));
+      const cb = el('input'); cb.type = 'checkbox'; cb.id = 'q31-' + i; cb.checked = S.q31.sel.includes(o);
+      cb.onchange = () => {
+        S.q31.sel = cb.checked ? S.q31.sel.concat(o) : S.q31.sel.filter((x) => x !== o);
+        l.classList.toggle('on', cb.checked); other.hidden = !S.q31.sel.includes(OTHER); save();
+      };
+      l.append(cb, el('span', null, o)); box.append(l);
+    });
+    other.hidden = !S.q31.sel.includes(OTHER);
+    c.append(box, other); p.append(c);
+  }
+  function buildP4(p) {
+    p.append(head('4 / 4', 'AI에 구도 전달하기', 'AI로 이미지를 만들 때 원하는 구도를 전달하려고, 레퍼런스를 직접 만든다고 가정해 주세요.'));
+    const c1 = el('div', 'card');
+    qhead(c1, '4-1', '어떤 형태의 레퍼런스가 가장 편하고 효과적일 것 같으신가요?', '아래 예시를 보고 1~3위를 골라 주세요.');
+    const g = el('div', 'gallery');
+    Q41.forEach((o) => { const ex = el('div', 'ex'); ex.innerHTML = sketch(o.ex); ex.append(el('b', null, o.k), el('span', null, o.d)); g.append(ex); });
+    c1.append(g, rankControl(S.q41, Q41, 'q41'));
+    const rl = el('label', 'fld'); rl.append(document.createTextNode('그렇게 고른 이유'), el('span', 'sub', '편한 것과 효과적인 것이 다르다면 그 차이도 적어 주세요'));
+    const rt = el('textarea'); rt.id = 'q41-reason'; rt.value = S.q41.reason; rt.style.minHeight = '80px'; rt.oninput = () => { S.q41.reason = rt.value; save(); };
+    rl.append(rt); c1.append(rl); p.append(c1);
+
+    const c2 = el('div', 'card');
+    qhead(c2, '4-2', '구도 레퍼런스에서 AI가 반드시 이해하고 유지해야 할 정보는 무엇인가요?', '단순한 스케치나 레퍼런스 이미지를 넣었을 때 가장 정확하게 반영되었으면 하는 것을 1~3위로 골라 주세요.');
+    const dl = el('ul', 'deflist');
+    Q42.forEach((o) => { const li = el('li'); li.append(el('b', null, o.k), el('span', null, ' · ' + o.d)); dl.append(li); });
+    c2.append(dl, rankControl(S.q42, Q42, 'q42')); p.append(c2);
+
+    const c3 = el('div', 'card');
+    qhead(c3, '4-3', '러프 스케치나 따로 만든 구도 이미지 대신, 사진이나 완성된 이미지를 넣고 바꿀 부분을 프롬프트로 설명하는 방식은 어떠신가요?');
+    const sc = el('div', 'scale'); sc.setAttribute('role', 'group'); sc.setAttribute('aria-label', '4-3 점수');
+    for (let i = 1; i <= 5; i++) {
+      const b = el('button', S.q43 === i ? 'on' : '', String(i)); b.type = 'button'; b.setAttribute('aria-pressed', S.q43 === i);
+      b.onclick = () => { S.q43 = S.q43 === i ? 0 : i; Array.from(sc.children).forEach((x, j) => { x.classList.toggle('on', S.q43 === j + 1); x.setAttribute('aria-pressed', S.q43 === j + 1); }); save(); };
+      sc.append(b);
+    }
+    const ends = el('div', 'scale-ends'); ends.append(el('span', null, '1 · 전혀 쓰고 싶지 않다'), el('span', null, '5 · 매우 쓰고 싶다'));
+    c3.append(sc, ends); p.append(c3);
+
+    const c4 = el('div', 'card');
+    qhead(c4, '4-4', '왜 그렇게 생각하시나요? 이 방식을 좋아하거나 싫어하게 된 실제 경험이 있다면 들려 주세요.',
+      '어떤 이미지를 넣었고, 무엇을 바꾸려 했고, 결과가 어땠는지 적어 주시면 큰 도움이 돼요.');
+    const t4 = el('textarea'); t4.id = 'q44'; t4.value = S.q44; t4.style.minHeight = '130px'; t4.setAttribute('aria-label', '4-4 답변');
+    t4.oninput = () => { S.q44 = t4.value; save(); };
+    c4.append(t4, uploader('e1', '그때 쓴 이미지나 결과물', '선택'));
+    p.append(c4);
+  }
+  function buildDone(p) {
+    p.append(head('완료', '참여해 주셔서 감사합니다',
+      S.submitted ? '답변과 그림이 저장됐어요. 이 창은 닫으셔도 돼요.' : '아직 제출 전이에요.'));
+    if (TEST) {
+      const b = el('button', 'btn', '테스트: 새 응답으로 처음부터'); b.type = 'button';
+      b.onclick = () => { S = blank(); Object.keys(pending).forEach((k) => delete pending[k]); persist(); show(0); };
+      const box = el('div'); box.append(b); p.append(box);
+    }
+  }
+
+  // ---------- navigation ----------
+  function busy() { return Object.keys(pending).some((k) => pending[k].some((p) => p.status === 'up' || p.status === 'wait')); }
+  function show(i) {
+    S.page = Math.max(0, Math.min(PAGES.length - 1, i)); persist();
+    const host = $('pages'); host.innerHTML = '';
+    const p = el('section', 'page'); PAGES[S.page].build(p);
+    const m = el('p', 'msg'); m.id = 'pageMsg'; m.hidden = true; p.append(m);
+    host.append(p);
+    const last = S.page === PAGES.length - 2, done = S.page === PAGES.length - 1;
+    $('prevBtn').hidden = S.page === 0 || done;
+    $('nextBtn').hidden = done;
+    $('nextBtn').textContent = S.page === 0 ? (S.updatedAt ? '이어서 하기' : '시작하기') : last ? '제출하기' : '다음';
+    $('count').textContent = S.page >= 1 && S.page <= 4 ? S.page + ' / 4' : '';
+    $('trackFill').style.width = (done ? 100 : Math.max(0, S.page - 1) * 25) + '%';
+    if (done) $('status').textContent = '';
+    window.scrollTo(0, 0);
+  }
+  $('prevBtn').onclick = () => show(S.page - 1);
+  $('nextBtn').onclick = () => {
+    const msg = $('pageMsg');
+    if (busy()) { msg.textContent = '파일을 올리는 중이에요. 끝난 뒤 다시 눌러 주세요.'; msg.hidden = false; return; }
+    const err = PAGES[S.page].check ? PAGES[S.page].check() : '';
+    if (err) { msg.textContent = err; msg.hidden = false; return; }
+    if (S.page === PAGES.length - 2) {
+      S.submitted = true; $('nextBtn').disabled = true;
+      save(true).then((ok) => {
+        $('nextBtn').disabled = false;
+        if (ENDPOINT && !ok) { S.submitted = false; persist(); msg.textContent = '제출하지 못했어요. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.'; msg.hidden = false; return; }
+        show(S.page + 1);
+      });
+      return;
+    }
+    if (S.page === 0 && !S.updatedAt) save();
+    show(S.page + 1);
+  };
+  if (TEST) $('testTag').hidden = false;
+  show(S.submitted ? PAGES.length - 1 : S.page || 0);
+})();
+</script>
+</body>
+</html>
